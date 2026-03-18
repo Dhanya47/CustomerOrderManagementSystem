@@ -1,14 +1,17 @@
 
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Linq;
 using BuildingBlocks.CQRS;
-﻿using Carter;
+using BuildingBlocks.Exceptions;
+using Carter;
 using Google.Cloud.Spanner.Data;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Ordering.API;
+using Ordering.API.DTOs;
+using Ordering.API.Events;
+using Ordering.API.PubSub;
 using Ordering.Application;
-using OrderingAPI;
 using OrderingInfrastructure;
 
 
@@ -38,8 +41,42 @@ var app = builder.Build();
 builder.Services.AddApplicationServices()
     .AddInfrastructureServices(builder.Configuration)
     .AddAPIServices();
-    
-app.MapGet("/", () => "Hello World test again!");
+
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next();
+    }
+    catch (BadHttpRequestException ex)
+    {
+        // Handles invalid JSON / binding errors
+        context.Response.StatusCode = StatusCodes.Status400BadRequest;
+        await context.Response.WriteAsJsonAsync(new
+        {
+            error = "Invalid JSON format",
+            detail = ex.Message
+        });
+    }
+    catch (DomainException dex)
+    {
+        // Handles domain/business errors
+        context.Response.StatusCode = StatusCodes.Status400BadRequest;
+        await context.Response.WriteAsJsonAsync(new { error = dex.Message });
+    }
+    catch (Exception ex)
+    {
+        // Handles unexpected errors
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        await context.Response.WriteAsJsonAsync(new
+        {
+            error = "An unexpected error occurred",
+            detail = ex.Message
+        });
+    }
+});
+
+//app.MapGet("/", () => "Hello World test again!");
 
 
 if (app.Environment.IsDevelopment())

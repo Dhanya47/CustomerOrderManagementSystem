@@ -1,6 +1,6 @@
 ﻿using BuildingBlocks.CQRS;
 using MediatR;
-namespace OrderingAPI
+namespace Ordering.API.DTOs
 {
     public record CreateOrderCommand(
         long OrderId,

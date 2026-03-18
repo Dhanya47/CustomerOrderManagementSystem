@@ -3,9 +3,10 @@ using BuildingBlocks.Exceptions;
 using Google.Cloud.Spanner.Data;
 using MediatR;
 using Microsoft.Extensions.Options;
-using Ordering.API;
+using Ordering.API.DTOs;
+using Ordering.API.PubSub;
 
-namespace OrderingAPI
+namespace Ordering.API.Events
 {
     public class CreateOrderHandler : ICommandHandler<CreateOrderCommand, CreateOrderResult>
     {
@@ -45,22 +46,6 @@ namespace OrderingAPI
                     });
                 orderCmd.Transaction = transaction;
                 await orderCmd.ExecuteNonQueryAsync();
-
-                //foreach (var item in command.Items)
-                //{
-                //    var itemCmd = connection.CreateInsertCommand("OrderItems",
-                //        new SpannerParameterCollection
-                //        {
-                //        { "OrderItemId", SpannerDbType.Int64, item.OrderItemId },
-                //        { "OrderId", SpannerDbType.Int64, command.OrderId },
-                //        { "ProductName", SpannerDbType.String, item.ProductName },
-                //        { "Quantity", SpannerDbType.Int64, item.Quantity },
-                //        { "UnitPrice", SpannerDbType.Float64, item.UnitPrice }
-                //        });
-                //    itemCmd.Transaction = transaction;
-                //    await itemCmd.ExecuteNonQueryAsync();
-                //}
-
                 await transaction.CommitAsync();
                 
 

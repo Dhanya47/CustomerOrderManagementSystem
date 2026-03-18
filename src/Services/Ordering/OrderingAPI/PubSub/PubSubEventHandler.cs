@@ -4,7 +4,7 @@ using Google.Cloud.PubSub.V1;
 using Google.Protobuf;
 using Microsoft.Extensions.Options;
 
-namespace Ordering.API
+namespace Ordering.API.PubSub
 {
     public class PubSubEventHandler : IEventPublisher
     {

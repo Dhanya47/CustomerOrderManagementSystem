@@ -1,4 +1,4 @@
-﻿namespace Ordering.API
+﻿namespace Ordering.API.PubSub
 {
     public class PubSubOptions
     {

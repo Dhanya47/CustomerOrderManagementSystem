@@ -2,8 +2,9 @@
 using Carter;
 using MediatR;
 using Microsoft.AspNetCore.Routing;
+using Ordering.API.DTOs;
 
-namespace OrderingAPI
+namespace Ordering.API.EndPoints
 {
     public class CreateOrderModule : ICarterModule
     {

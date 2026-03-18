@@ -1,4 +1,4 @@
-﻿namespace OrderingAPI
+﻿namespace Ordering.API.DTOs
 {
     public record CreateOrderRequest(
     long OrderId,
