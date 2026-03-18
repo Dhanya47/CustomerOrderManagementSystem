@@ -16,7 +16,7 @@ var app = builder.Build();
 builder.Services.AddApplicationServices()
     .AddInfrastructureServices(builder.Configuration)
     .AddAPIServices();
-    .
+    
 app.MapGet("/", () => "Hello World test again!");
 
 if (app.Environment.IsDevelopment())
