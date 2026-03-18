@@ -19,4 +19,9 @@
     <Folder Include="Endpoints\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\OrderingApplication\Ordering.Application.csproj" />
+    <ProjectReference Include="..\OrderingInfrastructure\Ordering.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

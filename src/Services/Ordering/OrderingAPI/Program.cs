@@ -1,6 +1,9 @@
 ﻿using System.Diagnostics;
 using System.Linq;
 using Google.Cloud.Spanner.Data;
+using Ordering.API;
+using Ordering.Application;
+using OrderingInfrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +13,10 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+builder.Services.AddApplicationServices()
+    .AddInfrastructureServices(builder.Configuration)
+    .AddAPIServices();
+    .
 app.MapGet("/", () => "Hello World test again!");
 
 if (app.Environment.IsDevelopment())
@@ -33,15 +40,15 @@ app.MapGet("/spanner-test", async () =>
 
     try
     {
-        using var connection = new SpannerConnection(connectionString);
-        var cmd = connection.CreateSelectCommand(@"SELECT ""Hello World"" as test");
+         var connection = new SpannerConnection(connectionString);
+        //var cmd = connection.CreateSelectCommand(@"SELECT ""Hello World"" as test");
 
-        using var reader = await cmd.ExecuteReaderAsync();
-        if (await reader.ReadAsync())
-        {
-            var value = reader.GetFieldValue<string>("test");
-            return Results.Ok(new { result = value });
-        }
+        //using var reader = await cmd.ExecuteReaderAsync();
+        //if (await reader.ReadAsync())
+        //{
+        //    var value = reader.GetFieldValue<string>("test");
+        //    return Results.Ok(new { result = value });
+        //}
 
         return Results.NotFound();
     }
