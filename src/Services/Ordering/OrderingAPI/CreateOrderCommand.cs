@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using BuildingBlocks.CQRS;
+using MediatR;
 namespace OrderingAPI
 {
     public record CreateOrderCommand(
@@ -6,7 +7,7 @@ namespace OrderingAPI
         long CustomerId,
         DateTime OrderDate,
         string Status,
-        double TotalAmount) : IRequest<CreateOrderResult>;
+        double TotalAmount) : ICommand<CreateOrderResult>;
     //List<CreateOrderItemRequest> Items) : IRequest<CreateOrderResult>;
 
     public record CreateOrderResult(long Id, string Status);

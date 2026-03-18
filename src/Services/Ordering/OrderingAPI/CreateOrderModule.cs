@@ -1,4 +1,5 @@
-﻿using Carter;
+﻿using BuildingBlocks.CQRS;
+using Carter;
 using MediatR;
 using Microsoft.AspNetCore.Routing;
 
@@ -8,17 +9,20 @@ namespace OrderingAPI
     {
         public void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapPost("/orders", async (CreateOrderRequest request, ISender sender) =>
+            app.MapPost("/orders", async (
+                CreateOrderRequest request,
+                ICommandHandler<CreateOrderCommand, CreateOrderResult> handler
+            ) =>
             {
                 var command = new CreateOrderCommand(
-                request.OrderId,
-                request.CustomerId,
-                request.OrderDate,
-                request.Status,
-                request.TotalAmount
-            );
+                    request.OrderId,
+                    request.CustomerId,
+                    request.OrderDate,
+                    request.Status,
+                    request.TotalAmount
+                );
 
-                var result = await sender.Send(command);
+                var result = await handler.Handle(command, CancellationToken.None);
 
                 var response = new CreateOrderResponse(result.Id, result.Status);
 
@@ -28,7 +32,7 @@ namespace OrderingAPI
             .Produces<CreateOrderResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Create Order")
-            .WithDescription("Create a new order with items");
+            .WithDescription("Create a new order");
         }
     }
 }

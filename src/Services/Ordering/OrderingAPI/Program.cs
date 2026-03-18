@@ -1,7 +1,16 @@
+
+﻿using System.Diagnostics;
+using System.Linq;
+using BuildingBlocks.CQRS;
 ﻿using Carter;
+using Google.Cloud.Spanner.Data;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using Ordering.API;
+using Ordering.Application;
 using OrderingAPI;
+using OrderingInfrastructure;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,13 +23,25 @@ builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(CreateOrderHandler).Assembly);
 });
 
+builder.Services.AddScoped<ICommandHandler<CreateOrderCommand, CreateOrderResult>, CreateOrderHandler>();
+builder.Services.AddScoped<IEventPublisher, PubSubEventHandler>();
+builder.Services.Configure<PubSubOptions>(
+    builder.Configuration.GetSection("PubSub"));
+
 // Register Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Enable Swagger in development
+
+builder.Services.AddApplicationServices()
+    .AddInfrastructureServices(builder.Configuration)
+    .AddAPIServices();
+    
+app.MapGet("/", () => "Hello World test again!");
+
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -33,76 +54,8 @@ if (app.Environment.IsDevelopment())
 // Map Carter modules (e.g. CreateOrderModule)
 app.MapCarter();
 
+
 app.Run();
 
 
-
-//using System.Diagnostics;
-//using System.Linq;
-//using Google.Cloud.Spanner.Data;
-
-//var builder = WebApplication.CreateBuilder(args);
-
-//// ✅ Register required services
-//builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
-
-//var app = builder.Build();
-
-//app.MapGet("/", () => "Hello World test again!");
-
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI(c =>
-//    {
-//        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Ordering API V1");
-//    });
-//}
-
-//// Spanner test endpoint (unchanged)
-//app.MapGet("/spanner-test", async () =>
-//{
-//    string projectId = "sudheerproject-489306";
-//    string instanceId = "testinstance";
-//    string databaseId = "my-test-db";
-//    string connectionString =
-//        $"Data Source=projects/{projectId}/instances/{instanceId}/"
-//        + $"databases/{databaseId}";
-
-//    try
-//    {
-//        using var connection = new SpannerConnection(connectionString);
-//        var cmd = connection.CreateSelectCommand(@"SELECT ""Hello World"" as test");
-
-//        using var reader = await cmd.ExecuteReaderAsync();
-//        if (await reader.ReadAsync())
-//        {
-//            var value = reader.GetFieldValue<string>("test");
-//            return Results.Ok(new { result = value });
-//        }
-
-//        return Results.NotFound();
-//    }
-//    catch (Exception ex)
-//    {
-//        return Results.Problem(detail: ex.Message, title: "Spanner query failed");
-//    }
-//});
-
-//// Start the host, then open the browser automatically to Swagger (local dev convenience).
-//await app.StartAsync();
-
-//var launchUrl = app.Urls.FirstOrDefault() ?? builder.Configuration["applicationUrl"] ?? "http://localhost:5003";
-//var openUrl = $"{launchUrl.TrimEnd('/')}/swagger";
-
-//try
-//{
-//    Process.Start(new ProcessStartInfo { FileName = openUrl, UseShellExecute = true });
-//}
-//catch
-//{
-//    // ignore failures to open browser
-//}
-
-//await app.WaitForShutdownAsync();
+    
