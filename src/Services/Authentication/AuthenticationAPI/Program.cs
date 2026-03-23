@@ -95,7 +95,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
-app.UseAuthorization();
+//app.UseAuthorization();
 
 // Health check endpoints
 app.MapHealthChecks("/health");
