@@ -1,4 +1,6 @@
-﻿namespace NotificationAPI.Subscribers
+﻿using Google.Cloud.PubSub.V1;
+
+namespace NotificationAPI.Subscribers
 {
     public class OrderCreatedSubscriber
     {
